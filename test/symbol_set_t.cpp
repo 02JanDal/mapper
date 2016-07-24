@@ -124,6 +124,11 @@ void SymbolSetTool::processSymbolSet_data()
 	QTest::newRow("ISSkiOM 1:15000") << QString::fromLatin1("ISSkiOM") << 15000u << 15000u;
 	QTest::newRow("ISSkiOM 1:10000") << QString::fromLatin1("ISSkiOM") << 15000u << 10000u;
 	QTest::newRow("ISSkiOM 1:5000")  << QString::fromLatin1("ISSkiOM") << 15000u <<  5000u;
+	
+	QTest::newRow("Course Design 1:15000") << QString::fromLatin1("Course_Design") << 15000u << 15000u;
+	QTest::newRow("Course Design 1:10000") << QString::fromLatin1("Course_Design") << 15000u << 10000u;
+	QTest::newRow("Course Design 1:5000")  << QString::fromLatin1("Course_Design") << 15000u <<  5000u;
+	QTest::newRow("Course Design 1:4000")  << QString::fromLatin1("Course_Design") << 15000u <<  4000u;
 }
 
 void SymbolSetTool::processSymbolSet()
@@ -288,6 +293,11 @@ void SymbolSetTool::processSymbolSet()
 			}
 			QCOMPARE(symbols_changed, 152);
 			QCOMPARE(north_lines_changed, 2);
+		}
+		else if (name.startsWith(QLatin1String("Course_Design")))
+		{
+			const double factor = double(source_scale) / double(target_scale);
+			map.scaleAllObjects(factor, MapCoord());
 		}
 		else
 		{
