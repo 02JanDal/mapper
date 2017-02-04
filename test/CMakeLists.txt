@@ -25,6 +25,8 @@ find_package(Qt5Test REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
+include(UseCatch)
+
 if(Mapper_DEVELOPMENT_BUILD)
 	include(EnableSanitize)
 	enable_sanitize(address undefined NO_RECOVER)
@@ -52,9 +54,12 @@ add_definitions(
 function(add_test_helper testname autorun)
 	unset(TEST_${testname}_SRCS)
 	set(manual_test 0)
+	set(use_catch 0)
 	foreach(arg ${ARGN})
 		if("${arg}" STREQUAL "MANUAL")
 			set(manual_test 1)
+		elseif("${arg}" STREQUAL "CATCH")
+			set(use_catch 1)
 		else()
 			list(APPEND TEST_${testname}_SRCS ${arg}.cpp)
 		endif()
@@ -62,10 +67,15 @@ function(add_test_helper testname autorun)
 	add_executable(${testname} ${testname}.cpp ${TEST_${testname}_SRCS})
 	target_link_libraries(${testname}
 	  PROJ4::proj
-	  Qt5::Test
 	  Qt5::Widgets
 	  Polyclipping::Polyclipping
 	)
+	if(use_catch)
+		target_link_libraries(${testname} Catch)
+	else()
+		target_link_libraries(${testname} Qt5::Test)
+	endif()
+
 	if(NOT manual_test)
 		configure_file(TESTNAME-RUN.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${testname}-RUN.cmake @ONLY)
 		add_test(${testname} ${CMAKE_COMMAND} -P ${testname}-RUN.cmake)
